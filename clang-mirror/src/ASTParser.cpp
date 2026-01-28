@@ -6,7 +6,6 @@
 
 #include "Logger.h"
 #include "Constants.h"
-#include "IncludesManager.h"
 #include "CommandLineParser.h"
 #include "clang-tidy/ClangTidyDiagnosticConsumer.h"
 #include "ClangReflectDiagnosticConsumer.h"
@@ -76,12 +75,6 @@ namespace clang_reflect
 				newArgs.push_back("-Wno-error");
 				newArgs.push_back("-fsyntax-only");
 				newArgs.push_back("-ferror-limit=0");
-				
-				std::unordered_set<std::string> includeDirs;
-				IncludesManager::Instance().loadIncludeDirsForSource(pFilePath.str(), includeDirs);
-				for (auto& incDir : includeDirs) {
-					newArgs.push_back(std::string("-I" + incDir));
-				}
 			}
 			return newArgs;
 		};

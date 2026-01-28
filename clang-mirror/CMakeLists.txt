@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Executable name used by inc/src CMakeLists
 set(CXX_EXE_NAME clang-mirror)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin")
 
 # LLVM is under <root>/build/clang-21.1.0
 set(LLVM_ROOT "${CMAKE_SOURCE_DIR}/build/clang-21.1.0" CACHE PATH "Path to LLVM root")

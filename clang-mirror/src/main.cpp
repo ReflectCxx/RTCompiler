@@ -2,12 +2,12 @@
 #include <fstream>
 #include <filesystem>
 
-//#include "Constants.h"
+#include "Constants.h"
 #include "Logger.h"
-//#include "ClangDriver.h"
-//#include "FileManager.h"
+#include "ClangDriver.h"
+#include "FileManager.h"
 #include "CommandLineParser.h"
-//#include "ReflectableInterface.h"
+#include "ReflectableInterface.h"
 
 int main(int argc, char* argv[])
 {
@@ -17,9 +17,9 @@ int main(int argc, char* argv[])
 
     const std::string& baseDir = clang_reflect::CommandLineParser::getBaseDirectory();
 
-    //clang_reflect::ClangDriver::compileSourceFiles(baseDir);
+    clang_reflect::ClangDriver::compileSourceFiles(baseDir);
 
-    //clang_reflect::ReflectableInterface::Instance().dump();
+    clang_reflect::ReflectableInterface::Instance().dump();
 
     const auto& tsEnd = std::chrono::duration_cast<clang_reflect::Second> (clang_reflect::Clock::now() - tsBegin).count();
 

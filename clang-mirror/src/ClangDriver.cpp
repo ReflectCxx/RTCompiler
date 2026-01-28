@@ -1,11 +1,19 @@
-#include <thread>
-#include <set>
 
-#include "ClangDriver.h"
-#include "ASTParser.h"
-#include "FileManager.h"
+#include <set>
+#include <map>
+#include <deque>
+#include <vector>
+#include <string>
+#include <thread>
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+
 #include "Logger.h"
-#include "IncludesManager.h"
+#include "ASTParser.h"
+#include "ClangDriver.h"
+#include "FileManager.h"
+
 #include "clang/Tooling/CompilationDatabase.h"
 
 
@@ -43,12 +51,14 @@ namespace clang_reflect
         }
         else
         {
-            auto& fileManager = FileManager::Instance();
-            auto& srcFiles = fileManager.getSourceFilePaths();
-            auto& headerFiles = fileManager.getHeaderFilePaths();
-            IncludesManager::Instance().initSourceHeaderDependencyGraph(headerFiles, srcFiles);
+            std::cerr << "cdb not found.";
+            std::abort();
+            //auto& fileManager = FileManager::Instance();
+            //auto& srcFiles = fileManager.getSourceFilePaths();
+            //auto& headerFiles = fileManager.getHeaderFilePaths();
+            //IncludesManager::Instance().initSourceHeaderDependencyGraph(headerFiles, srcFiles);
 
-            runClangParser(pRootDir, srcFiles, std::move(cdb));
+            //runClangParser(pRootDir, srcFiles, std::move(cdb));
         }
     }
 

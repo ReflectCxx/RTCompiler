@@ -11,7 +11,6 @@ set(CLREFLECT_INCS
 	"${CMAKE_CURRENT_LIST_DIR}/Logger.h"
 	"${CMAKE_CURRENT_LIST_DIR}/Constants.h"
 	"${CMAKE_CURRENT_LIST_DIR}/ReflectableInterface.h"
-    # Add more header files as needed
 )
 
 # Add headers to the library target
