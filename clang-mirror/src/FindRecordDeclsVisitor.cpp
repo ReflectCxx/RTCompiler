@@ -204,7 +204,7 @@ namespace clang_reflect
 			pFuncDecl->getKind() == Decl::Kind::CXXDestructor ||
 			pFuncDecl->getAccess() == AccessSpecifier::AS_private ||
 			pFuncDecl->getAccess() == AccessSpecifier::AS_protected ||
-			pFuncDecl->getLinkageInternal() != Linkage::ExternalLinkage) {
+			pFuncDecl->getLinkageInternal() != Linkage::External) {
 			return true;
 		}
 

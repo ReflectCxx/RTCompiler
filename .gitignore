@@ -3,3 +3,4 @@
 /.vs
 CMakeCache.txt
 CMakeFiles/
+TestProjectSrc/build-ninja

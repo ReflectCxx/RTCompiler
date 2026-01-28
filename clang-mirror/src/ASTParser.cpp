@@ -69,7 +69,7 @@ namespace clang_reflect
 			CommandLineArguments newArgs = pArgs;
 			if (this->m_cdb == nullptr)
 			{
-				const bool isCFile = (pFilePath.endswith(".c") || pFilePath.endswith(".C"));
+				const bool isCFile = (pFilePath.ends_with_insensitive(".c") || pFilePath.ends_with_insensitive(".C"));
 				newArgs.push_back(isCFile ? "-std=c99" : "-std=c++14");
 				newArgs.push_back("-fopenmp");
 				newArgs.push_back("-fexceptions");
@@ -127,9 +127,10 @@ namespace clang_reflect
 			ClangTool clangTool(compileDb, { srcFilePath });
 			ClangTidyContext context(std::move(customOptsProvider));
 			ClangReflectDiagnosticConsumer diagConsumer(context);
-			DiagnosticsEngine diagEngine(new DiagnosticIDs(), new DiagnosticOptions(), &diagConsumer, false);
+			DiagnosticOptions diagOpts;
+			DiagnosticsEngine diagEngine(new DiagnosticIDs(), diagOpts, &diagConsumer, false);
 			
-			context.setDiagnosticsEngine(&diagEngine);
+			context.setDiagnosticsEngine(std::make_unique<DiagnosticOptions>(diagOpts), &diagEngine);
 			clangTool.setDiagnosticConsumer(&diagConsumer);
 			clangTool.appendArgumentsAdjuster(getArgumentsAdjuster());
 

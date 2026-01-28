@@ -157,8 +157,8 @@ namespace clang_reflect {
 			const std::string nativePath = toUnixStylePath(includeFile);
 			for (llvm::StringRef incPath : pFilePaths)
 			{
-				if (incPath.endswith(nativePath)) {
-					if (incPath.endswith("/" + nativePath)) {
+				if (incPath.ends_with_insensitive(nativePath)) {
+					if (incPath.ends_with_insensitive("/" + nativePath)) {
 						std::string dirPosix = incPath.substr(0, incPath.size() - nativePath.size() - 1).str();
 						m_incPathDictionary.insert(std::pair<std::string, std::string>(includeFile, dirPosix));
 					}
