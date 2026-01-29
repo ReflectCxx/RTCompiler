@@ -1,7 +1,7 @@
 #include "clang/AST/RecursiveASTVisitor.h"
 
 
-namespace clang_reflect {
+namespace clmirror {
 
     class ParmVarDeclsVisitor : public clang::RecursiveASTVisitor<ParmVarDeclsVisitor>
     {

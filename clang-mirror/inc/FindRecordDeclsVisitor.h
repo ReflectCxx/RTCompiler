@@ -3,7 +3,7 @@
 #include <map>
 #include "clang/AST/RecursiveASTVisitor.h"
 
-namespace clang_reflect {
+namespace clmirror {
 
     class FindRecordDeclsVisitor : public clang::RecursiveASTVisitor<FindRecordDeclsVisitor>
     {

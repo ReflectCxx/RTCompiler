@@ -5,7 +5,7 @@
 #include <vector>
 #include <chrono>
 
-namespace clang_reflect {
+namespace clmirror {
 
 	static const char* const RESET = "\033[0m";
 	static const char* const DARK_RED = "\033[31m";

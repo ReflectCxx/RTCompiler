@@ -4,7 +4,6 @@
 #include <filesystem>
 
 #include "Logger.h"
-#include "CommandLineParser.h"
 #include "ReflectableInterface.h"
 
 namespace {
@@ -12,7 +11,7 @@ namespace {
 	std::mutex g_mutex;
 }
 
-namespace clang_reflect 
+namespace clmirror 
 {
 	ReflectableInterface::ReflectableInterface() {
 
@@ -62,9 +61,7 @@ namespace clang_reflect
 
 	void ReflectableInterface::dump()
 	{
-		std::string fileStr = (CommandLineParser::getInterfaceDumpDir() + "/" + CL_REFLECT_INTERFACE);
-		std::replace(fileStr.begin(), fileStr.end(), '\\', '/');
-
+		const std::string fileStr = std::filesystem::current_path().string() + "/" + CL_REFLECT_INTERFACE;
 		std::fstream fout(fileStr, std::ios::out);
 
 		if (!fout.is_open()) {

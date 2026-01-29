@@ -11,7 +11,7 @@ namespace {
 	static  std::mutex g_mutex;
 }
 
-namespace clang_reflect {
+namespace clmirror {
 
 	std::size_t Logger::m_totalCount = 0;
 	std::size_t Logger::m_currentCount = 0;

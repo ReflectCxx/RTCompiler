@@ -1,29 +1,26 @@
 
 #include <fstream>
+#include <iostream>
 #include <filesystem>
 
 #include "Constants.h"
 #include "Logger.h"
 #include "ClangDriver.h"
-#include "FileManager.h"
-#include "CommandLineParser.h"
 #include "ReflectableInterface.h"
 
-int main(int argc, char* argv[])
+int main(int argc, const char** argv)
 {
-    const auto& tsBegin = clang_reflect::Clock::now();
-
-    clang_reflect::CommandLineParser::parse(argc, argv);
-
-    const std::string& baseDir = clang_reflect::CommandLineParser::getBaseDirectory();
-
-    clang_reflect::ClangDriver::compileSourceFiles(baseDir);
-
-    clang_reflect::ReflectableInterface::Instance().dump();
-
-    const auto& tsEnd = std::chrono::duration_cast<clang_reflect::Second> (clang_reflect::Clock::now() - tsBegin).count();
-
-    clang_reflect::Logger::out("Total time elapsed: " + std::to_string(tsEnd) + "\n");
-
+    const auto& tsBegin = clmirror::Clock::now();
+    if (!clmirror::ClangDriver::compileSourceFiles(argc, argv))
+    {
+        clmirror::ReflectableInterface::Instance().dump();
+        const auto& tsEnd = std::chrono::duration_cast<clmirror::Second> (clmirror::Clock::now() - tsBegin).count();
+        clmirror::Logger::out("Total time elapsed: " + std::to_string(tsEnd) + "\n");
+    }
+    else 
+    {
+        clmirror::Logger::outException("\n[clang-mirror failed]");
+    }
+    std::cout << clmirror::RESET << std::endl;
     return 0;
 }

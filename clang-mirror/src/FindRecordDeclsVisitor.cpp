@@ -7,11 +7,10 @@
 #include "ParamVarDeclsVisitor.h"
 #include "clang/Basic/SourceManager.h"
 #include "ReflectableInterface.h"
-#include "CommandLineParser.h"
 #include "clang/Lex/Lexer.h"
 
 
-namespace clang_reflect
+namespace clmirror
 {
 	using namespace clang;
 

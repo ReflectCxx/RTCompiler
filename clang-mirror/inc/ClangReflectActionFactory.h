@@ -5,15 +5,15 @@
 #include "clang/Frontend/FrontendAction.h"
 #include "clang-tidy/ClangTidyDiagnosticConsumer.h"
 
-namespace clang_reflect 
+namespace clmirror 
 {
-	class ClangReflectActionFactory : public clang::tooling::FrontendActionFactory
+	class ActionFactory : public clang::tooling::FrontendActionFactory
 	{
 		std::vector<std::string> m_unreflectedFunctions;
 
 	public:
 
-		ClangReflectActionFactory(clang::tidy::ClangTidyContext& pContext);
+		ActionFactory(clang::tidy::ClangTidyContext& pContext);
 
 		std::unique_ptr<clang::FrontendAction> create() override;
 

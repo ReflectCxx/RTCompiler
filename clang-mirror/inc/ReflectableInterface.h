@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace clang_reflect 
+namespace clmirror 
 {
 	class ReflectableInterface
 	{

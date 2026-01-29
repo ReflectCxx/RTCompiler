@@ -28,7 +28,7 @@ namespace {
 
 		virtual void HandleTranslationUnit(clang::ASTContext& Context)
 		{
-			clang_reflect::FindRecordDeclsVisitor visitor(m_currentSrcFile, m_unreflectedFunctions);
+			clmirror::FindRecordDeclsVisitor visitor(m_currentSrcFile, m_unreflectedFunctions);
 			visitor.TraverseDecl(Context.getTranslationUnitDecl());
 		}
 	};
@@ -68,19 +68,19 @@ namespace {
 }
 
 
-namespace clang_reflect {
+namespace clmirror {
 
-	ClangReflectActionFactory::ClangReflectActionFactory(clang::tidy::ClangTidyContext& pContext)
+	ActionFactory::ActionFactory(clang::tidy::ClangTidyContext& pContext)
 	{
 
 	}
 
-	std::unique_ptr<clang::FrontendAction> ClangReflectActionFactory::create()
+	std::unique_ptr<clang::FrontendAction> ActionFactory::create()
 	{
 		return std::make_unique<FindRecordDeclsAction>(m_unreflectedFunctions);
 	}
 
-	const std::vector<std::string>& ClangReflectActionFactory::getUnreflectedFunctions()
+	const std::vector<std::string>& ActionFactory::getUnreflectedFunctions()
 	{
 		return m_unreflectedFunctions;
 	}

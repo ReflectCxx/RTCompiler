@@ -6,7 +6,6 @@
 
 #include "Logger.h"
 #include "Constants.h"
-#include "CommandLineParser.h"
 #include "clang-tidy/ClangTidyDiagnosticConsumer.h"
 #include "ClangReflectDiagnosticConsumer.h"
 #include "ClangReflectActionFactory.h"
@@ -19,67 +18,24 @@ using namespace clang::tooling;
 namespace
 {
 	std::mutex g_mutex;
-	static cl::OptionCategory toolCategory(clang_reflect::CLANG_MIRROR);
+	static cl::OptionCategory toolCategory(clmirror::CLANG_MIRROR);
 	static cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 	static cl::extrahelp MoreHelp("\nMore help text...\n");
 }
 
 
-namespace clang_reflect
+namespace clmirror
 {
-	ASTParser::ASTParser(	const std::string& pBaseDir,
-							const std::vector<std::string>& pFiles,
-							CompilationDatabase* pCdb)
+	ASTParser::ASTParser(const std::vector<std::string>& pFiles, CompilationDatabase& pCdb)
 		: m_files(pFiles)
 		, m_cdb(pCdb)
-	{
+	{ }
 
-	}
-
-	
 	Expected<CommonOptionsParser> ASTParser::getCommonOptionsParser(int pArgc, const std::vector<char*>& pArgv)
 	{
 		std::lock_guard<std::mutex> lock(g_mutex);
 		return CommonOptionsParser::create(pArgc, (const char**)(&pArgv[0]), toolCategory);
 	}
-
-
-	const std::string ASTParser::getRelativePath(const std::string& pFileName)
-	{
-		static std::string baseDir;
-		if (baseDir.empty()) {
-			baseDir = CommandLineParser::getBaseDirectory();
-			std::replace(baseDir.begin(), baseDir.end(), '\\', '/');
-		}
-
-		auto fileName = pFileName;
-		std::replace(fileName.begin(), fileName.end(), '\\', '/');
-		if (fileName.find(baseDir) == 0) {
-			fileName.erase(0, baseDir.length() + 1);
-		}
-		return fileName;
-	}
-
-
-	ArgumentsAdjuster ASTParser::getArgumentsAdjuster()
-	{
-		return [this](const CommandLineArguments& pArgs, StringRef pFilePath) 
-		{
-			CommandLineArguments newArgs = pArgs;
-			if (this->m_cdb == nullptr)
-			{
-				const bool isCFile = (pFilePath.ends_with_insensitive(".c") || pFilePath.ends_with_insensitive(".C"));
-				newArgs.push_back(isCFile ? "-std=c99" : "-std=c++14");
-				newArgs.push_back("-fopenmp");
-				newArgs.push_back("-fexceptions");
-				newArgs.push_back("-Wno-error");
-				newArgs.push_back("-fsyntax-only");
-				newArgs.push_back("-ferror-limit=0");
-			}
-			return newArgs;
-		};
-	}
-
 
 	const int ASTParser::parseFiles(const int pStartIndex, const int pEndIndex)
 	{
@@ -91,7 +47,7 @@ namespace clang_reflect
 
 			Logger::outProgress("compiling: " + std::string(srcFilePath));
 
-			if (m_cdb && !std::filesystem::exists(srcFilePath)) {
+			if (!std::filesystem::exists(srcFilePath)) {
 				Logger::outProgress(srcFilePath + std::string(". File not found..!"), false);
 				continue;
 			}
@@ -115,9 +71,10 @@ namespace clang_reflect
 				return -1;
 			}
 
-			const auto& compileDb = (m_cdb ? *m_cdb : commonOptionParser.get().getCompilations());
+			ClangTool clangTool(m_cdb, { srcFilePath });
+			//ClangTool Tool(Compilations, InputFiles,
+			//	std::make_shared<PCHContainerOperations>(), BaseFS);
 
-			ClangTool clangTool(compileDb, { srcFilePath });
 			ClangTidyContext context(std::move(customOptsProvider));
 			ClangReflectDiagnosticConsumer diagConsumer(context);
 			DiagnosticOptions diagOpts;
@@ -125,14 +82,14 @@ namespace clang_reflect
 			
 			context.setDiagnosticsEngine(std::make_unique<DiagnosticOptions>(diagOpts), &diagEngine);
 			clangTool.setDiagnosticConsumer(&diagConsumer);
-			clangTool.appendArgumentsAdjuster(getArgumentsAdjuster());
+			//clangTool.appendArgumentsAdjuster(getArgumentsAdjuster());
 
-			auto actionFactory = std::unique_ptr<ClangReflectActionFactory>(new ClangReflectActionFactory(context));
+			auto actionFactory = std::unique_ptr<ActionFactory>(new ActionFactory(context));
 			clangTool.run(actionFactory.get());
 
 			auto unreflectedFuncs = actionFactory->getUnreflectedFunctions();
 			auto missingHeaderErrors = diagConsumer.getMissingHeaderMsgs();
-			Logger::outReflectError(getRelativePath(srcFilePath), unreflectedFuncs, missingHeaderErrors);
+			Logger::outReflectError(srcFilePath, unreflectedFuncs, missingHeaderErrors);
 		}
 		return 0;
 	}
