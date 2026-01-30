@@ -4,7 +4,11 @@
 #include <vector>
 #include <string>
 
-#include "MetaFunction.h"
+
+namespace clmirror {
+	struct UserType;
+	struct ReflectionMeta;
+}
 
 namespace clmirror 
 {
@@ -14,10 +18,13 @@ namespace clmirror
 		using FuncHeaderMap = std::map<std::string, FuncSignature>;
 		std::map<std::string, FuncHeaderMap> m_functionSignatureMap;
 
-		std::vector<MetaFunction> m_metaFns;
+		std::vector<ReflectionMeta> m_metaFns;
+		std::unordered_map<std::string, UserType> m_metaTypes;
 
 		ReflectableInterface();
 		~ReflectableInterface();
+
+		void addReflectionMetaAsRecord(const ReflectionMeta& pReflMeta);
 
 	public:
 
@@ -26,9 +33,9 @@ namespace clmirror
 
 		static ReflectableInterface& Instance();
 
-		void addFunctionSignature(MetaKind pMetaKind, const std::string& pSrcFile, const std::string& pHeaderFile,
-								  const std::string& pRecord, const std::string& pFunctionName,
-								  const std::string& pReturn, const std::vector<std::string>& pParmTypes);
+		void addFunctionSignature(MetaKind pMetaKind, const std::string& pSrcFile,
+								  const std::string& pHeaderFile, const std::string& pRecord,
+								  const std::string& pFunctionName, const std::vector<std::string>& pParmTypes);
 		void dump();
 	};
 }

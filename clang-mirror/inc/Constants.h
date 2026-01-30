@@ -42,10 +42,11 @@ namespace clmirror
 	enum class MetaKind 
 	{
 		None,
+		Type,
 		CtorDtor,
-		NonMember,
-		MemberConst,
-		MemberStatic,
-		MemberNonConst
+		NonMemberFn,
+		MemberFnConst,
+		MemberFnStatic,
+		MemberFnNonConst
 	};
 }

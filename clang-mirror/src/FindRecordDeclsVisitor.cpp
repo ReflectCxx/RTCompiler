@@ -266,17 +266,31 @@ namespace clmirror
 				}
 
 				
-				const std::string returnStr = "";
-				const std::string recordStr = extractParentTypeName(pFuncDecl);
-
-				MetaKind metaKind = MetaKind::MemberNonConst;
+				MetaKind metaKind = MetaKind::MemberFnNonConst;
 				if (llvm::isa<clang::CXXConstructorDecl>(pFuncDecl) || 
 					llvm::isa<clang::CXXDestructorDecl>(pFuncDecl)) {
 					metaKind = MetaKind::CtorDtor;
 				}
+				else if (const auto* method = llvm::dyn_cast<clang::CXXMethodDecl>(pFuncDecl)) {
+					if (method->isStatic()) {
+						metaKind = MetaKind::MemberFnStatic;
+					}
+					else {
+						if (method->isConst()) {
+							metaKind = MetaKind::MemberFnConst;
+						}
+						else {
+							metaKind = MetaKind::MemberFnNonConst;
+						}
+					}
+				}
+				else {
+					metaKind = MetaKind::NonMemberFn;
+				}
+				const std::string recordStr = extractParentTypeName(pFuncDecl);
 
-				ReflectableInterface::Instance().addFunctionSignature(metaKind, m_currentSrcFile, declSrcFile, 
-																	  recordStr, functionName, returnStr, parmTypes);
+				ReflectableInterface::Instance().addFunctionSignature(metaKind, m_currentSrcFile, declSrcFile,
+																	  recordStr, functionName, parmTypes);
 			}
 		}
 		return true;

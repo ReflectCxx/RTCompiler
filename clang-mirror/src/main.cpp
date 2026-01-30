@@ -8,7 +8,7 @@
 #include "ClangDriver.h"
 #include "ReflectableInterface.h"
 
-//#include "rtcl_meta_ids.h"
+#include "../../build/clang-mirror/rtcl_meta_ids.h"
 
 int main(int argc, const char** argv)
 {
@@ -25,7 +25,9 @@ int main(int argc, const char** argv)
     }
     std::cout << clmirror::RESET << std::endl;
 
-    //rtl
+    auto type = rtcl::type::nsdate::Calender::id;
+
+    std::cout << "\n\n" << type << "\n\n";
 
     return 0;
 }

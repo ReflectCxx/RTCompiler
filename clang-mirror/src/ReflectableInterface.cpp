@@ -2,9 +2,10 @@
 #include <mutex>
 #include <fstream>
 #include <filesystem>
-
+#include <unordered_set>
 
 #include "Logger.h"
+#include "ReflectionMeta.h"
 #include "ReflectableInterface.h"
 
 
@@ -26,6 +27,29 @@ namespace clmirror
 	}
 
 
+	void ReflectableInterface::addReflectionMetaAsRecord(const ReflectionMeta& pReflMeta)
+	{
+		auto& userType = [&]()-> UserType&
+		{
+			const auto& itr = m_metaTypes.find(pReflMeta.fnRecord);
+			if (itr == m_metaTypes.end()) 
+			{
+				auto& userType = m_metaTypes.emplace(pReflMeta.fnRecord,
+					UserType{
+						.typeStr = pReflMeta.fnRecord,
+						.methods = UserType::MemberFnsMap()
+					}).first->second;
+				return userType;
+			}
+			else {
+				auto& userType = itr->second;
+				return userType;
+			}
+		}();
+		userType.methods.emplace(pReflMeta.fnName, pReflMeta);
+	}
+
+
 	ReflectableInterface& ReflectableInterface::Instance()
 	{
 		static ReflectableInterface instance;
@@ -33,9 +57,9 @@ namespace clmirror
 	}
 
 
-	void ReflectableInterface::addFunctionSignature(MetaKind pMetaKind, const std::string& pSrcFile, const std::string& pHeaderFile,
-													const std::string& pRecord, const std::string& pFunctionName,
-													const std::string& pReturn, const std::vector<std::string>& pParmTypes)
+	void ReflectableInterface::addFunctionSignature(MetaKind pMetaKind, const std::string& pSrcFile, 
+											        const std::string& pHeaderFile, const std::string& pRecord,
+													const std::string& pFunctionName, const std::vector<std::string>& pParmTypes)
 	{
 		std::lock_guard<std::mutex> lock(g_mutex);
 
@@ -62,16 +86,29 @@ namespace clmirror
 			}
 		}
 
-		m_metaFns.push_back(
-			MetaFunction{
-				.fnType = pMetaKind,
-				.fnHeader = pHeaderFile,
-				.fnSource = pSrcFile,
-				.fnName = pFunctionName,
-				.fnRecord = pRecord,
-				.fnReturn = pReturn,
-				.fnArgs = pParmTypes
+		if (pMetaKind == MetaKind::MemberFnConst ||
+			pMetaKind == MetaKind::MemberFnNonConst ||
+			pMetaKind == MetaKind::MemberFnStatic) {
+
+			addReflectionMetaAsRecord( ReflectionMeta{
+					.fnType = pMetaKind,
+					.fnHeader = pHeaderFile,
+					.fnSource = pSrcFile,
+					.fnName = pFunctionName,
+					.fnRecord = pRecord,
+					.fnArgs = pParmTypes
 			});
+		}
+		else {
+			m_metaFns.push_back( ReflectionMeta{
+					.fnType = pMetaKind,
+					.fnHeader = pHeaderFile,
+					.fnSource = pSrcFile,
+					.fnName = pFunctionName,
+					.fnRecord = pRecord,
+					.fnArgs = pParmTypes
+			});
+		}
 	}
 
 
@@ -90,12 +127,28 @@ namespace clmirror
 			"\n#include <string_view>\n\n"
 			"\nnamespace rtcl {\n";
 
-		for (const MetaFunction& fn : m_metaFns) {
-			if (fn.fnType != MetaKind::CtorDtor) {
-				fout << fn.toIdentifierSyntax();
+		for (const auto& itr : m_metaTypes) {
+
+			const auto& methodMap = itr.second.methods;
+			const auto& fnMeta = methodMap.begin()->second;
+			fout << fnMeta.toRecordIdentifierSyntax();
+			fout << "\n";
+
+			std::unordered_set<std::string> seen;
+
+			for (auto it = methodMap.begin(); it != methodMap.end(); ++it)
+			{
+				const std::string& key = it->first;
+				if (!seen.insert(key).second)
+					continue;
+
+				fout << it->second.toMethodIdentifierSyntax() << "\n";
+
+				//auto [first, last] = methodMap.equal_range(key);
 			}
+			fout << "\n";
 		}
-		fout << "\n\n}";
+		fout << "\n}";
 
 		fout.flush();
 		fout.close();
@@ -104,7 +157,7 @@ namespace clmirror
 			return;
 		}
 
-		Logger::out("Number of reflectable functions generated: " + std::to_string(m_metaFns.size()));
+		Logger::out("Number of reflectable types generated: " + std::to_string(m_metaTypes.size()));
 		//Logger::out("Number of headerfiles shortlisted, containing reflectable functions declarations: " + std::to_string(m_functionSignatureMap.size()));
 		Logger::out("Reflection interface file generated : " + fileStr);
 	}
