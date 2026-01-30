@@ -8,7 +8,7 @@
 #include "ClangDriver.h"
 #include "ReflectableInterface.h"
 
-#include "rtcl_meta_ids.h"
+//#include "rtcl_meta_ids.h"
 
 int main(int argc, const char** argv)
 {
@@ -25,7 +25,7 @@ int main(int argc, const char** argv)
     }
     std::cout << clmirror::RESET << std::endl;
 
-    rtl
+    //rtl
 
     return 0;
 }
