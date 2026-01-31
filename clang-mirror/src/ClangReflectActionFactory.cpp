@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "ClangReflectActionFactory.h"
-#include "FindRecordDeclsVisitor.h"
+#include "ReflectableDeclsVisitor.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "ASTParser.h"
@@ -28,7 +28,7 @@ namespace {
 
 		virtual void HandleTranslationUnit(clang::ASTContext& Context)
 		{
-			clmirror::FindRecordDeclsVisitor visitor(m_currentSrcFile, m_unreflectedFunctions);
+			clmirror::ReflectableDeclsVisitor visitor(m_currentSrcFile, m_unreflectedFunctions);
 			visitor.TraverseDecl(Context.getTranslationUnitDecl());
 		}
 	};
@@ -70,17 +70,17 @@ namespace {
 
 namespace clmirror {
 
-	ActionFactory::ActionFactory(clang::tidy::ClangTidyContext& pContext)
+	CLMirrorActionFactory::CLMirrorActionFactory(clang::tidy::ClangTidyContext& pContext)
 	{
 
 	}
 
-	std::unique_ptr<clang::FrontendAction> ActionFactory::create()
+	std::unique_ptr<clang::FrontendAction> CLMirrorActionFactory::create()
 	{
 		return std::make_unique<FindRecordDeclsAction>(m_unreflectedFunctions);
 	}
 
-	const std::vector<std::string>& ActionFactory::getUnreflectedFunctions()
+	const std::vector<std::string>& CLMirrorActionFactory::getUnreflectedFunctions()
 	{
 		return m_unreflectedFunctions;
 	}

@@ -19,8 +19,6 @@ namespace clmirror {
 	static const char* const TEAL = "\033[38;2;0;128;128m";
 	static const char* const GREY = "\033[38;2;118;118;118m";
 
-	static const char* const CLANG_MIRROR = "clang-mirror";
-
 	static const char* const CONST = "const";
 	static const char* const ENUM = "enum";
 	static const char* const CLASS = "class";

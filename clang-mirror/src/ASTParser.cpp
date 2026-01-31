@@ -1,4 +1,6 @@
+
 #include "ASTParser.h"
+#include "ASTParserUtils.h"
 
 #include <mutex>
 #include <iostream>
@@ -6,7 +8,6 @@
 
 #include "Logger.h"
 #include "Constants.h"
-#include "clang-tidy/ClangTidyDiagnosticConsumer.h"
 #include "ClangReflectDiagnosticConsumer.h"
 #include "ClangReflectActionFactory.h"
 
@@ -14,72 +15,6 @@ using namespace llvm;
 using namespace clang;
 using namespace clang::tidy;
 using namespace clang::tooling;
-
-namespace
-{
-	std::mutex g_mutex;
-	static cl::OptionCategory toolCategory(clmirror::CLANG_MIRROR);
-}
-
-
-
-namespace
-{
-	static cl::desc desc(StringRef Description) { return { Description.ltrim() }; }
-
-	static cl::OptionCategory ClangMirrorCategory("clang-mirror options");
-
-	static cl::opt<std::string> VfsOverlay("vfsoverlay",
-                                           desc(R"(Overlay the virtual filesystem described by file over the real file system.)"),
-                                           cl::value_desc("filename"),
-                                           cl::cat(ClangMirrorCategory));
-
-	static std::unique_ptr<ClangTidyOptionsProvider> createOptionsProvider(llvm::IntrusiveRefCntPtr<vfs::FileSystem> FS)
-	{
-		ClangTidyOptions DefaultOptions;
-		ClangTidyOptions OverrideOptions;
-		ClangTidyGlobalOptions GlobalOptions;
-
-		return std::make_unique<FileOptionsProvider>(std::move(GlobalOptions), std::move(DefaultOptions),
-			                                         std::move(OverrideOptions), std::move(FS));
-	}
-
-	static llvm::IntrusiveRefCntPtr<vfs::FileSystem> getVfsFromFile(const std::string& OverlayFile,
-                                                                    llvm::IntrusiveRefCntPtr<vfs::FileSystem> BaseFS)
-	{
-		llvm::ErrorOr<std::unique_ptr<llvm::MemoryBuffer>> Buffer = BaseFS->getBufferForFile(OverlayFile);
-
-		if (!Buffer) {
-			llvm::errs() << "Can't load virtual filesystem overlay file '"
-				<< OverlayFile << "': " << Buffer.getError().message()
-				<< ".\n";
-			return nullptr;
-		}
-
-		IntrusiveRefCntPtr<vfs::FileSystem> FS = vfs::getVFSFromYAML(std::move(Buffer.get()), /*DiagHandler*/ nullptr, OverlayFile);
-		if (!FS) {
-			llvm::errs() << "Error: invalid virtual filesystem overlay file '" << OverlayFile << "'.\n";
-			return nullptr;
-		}
-		return FS;
-	}
-
-	static llvm::IntrusiveRefCntPtr<vfs::OverlayFileSystem> createBaseFS()
-	{
-		llvm::IntrusiveRefCntPtr<vfs::OverlayFileSystem> BaseFS(new vfs::OverlayFileSystem(vfs::getRealFileSystem()));
-		if (!VfsOverlay.empty())
-		{
-			IntrusiveRefCntPtr<vfs::FileSystem> VfsFromFile = getVfsFromFile(VfsOverlay, BaseFS);
-			if (!VfsFromFile) {
-				return nullptr;
-			}
-			BaseFS->pushOverlay(std::move(VfsFromFile));
-		}
-		return BaseFS;
-	}
-}
-
-
 
 namespace clmirror
 {
@@ -123,7 +58,7 @@ namespace clmirror
 			context.setDiagnosticsEngine(std::move(diagOpts), &diagEngine);
 			clangTool.setDiagnosticConsumer(&diagConsumer);
 
-			auto actionFactory = std::unique_ptr<ActionFactory>(new ActionFactory(context));
+			auto actionFactory = std::make_unique<CLMirrorActionFactory>(context);
 			clangTool.run(actionFactory.get());
 
 			auto unreflectedFuncs = actionFactory->getUnreflectedFunctions();
