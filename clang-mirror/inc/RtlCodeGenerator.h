@@ -17,13 +17,13 @@ namespace clmirror
 	class RtlCodeGenerator 
 	{
 		const std::string m_srcFile;
-		mutable RtlRecordsMap m_recordsMap;
-		mutable RtlFunctionsMap m_freeFnsMap;
-		mutable std::unordered_set<std::string> m_incFiles;
+		RtlRecordsMap m_recordsMap;
+		RtlFunctionsMap m_freeFnsMap;
+		std::unordered_set<std::string> m_incFiles;
 
 		RtlCodeGenerator(const std::string& pSrcFile);
 
-		void addRtlRecord(const RtlFunction& pFnMeta) const;
+		void addRtlRecord(const RtlFunction& pFnMeta);
 
 	public:
 
@@ -37,7 +37,7 @@ namespace clmirror
 		GETTER_CREF(RtlFunctionsMap, FreeFunctionsMap, m_freeFnsMap)
 
 		void addFunction(MetaKind pMetaKind, const std::string& pHeaderFile, const std::string& pRecord,
-						 const std::string& pFnName, const std::vector<std::string>& pParamTypes) const;
+						 const std::string& pFnName, const std::vector<std::string>& pParamTypes);
 
 		friend RtlCodeManager;
 	};

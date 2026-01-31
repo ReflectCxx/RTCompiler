@@ -4,9 +4,6 @@
 #include "clang/Frontend/FrontendAction.h"
 #include "clang-tidy/ClangTidyDiagnosticConsumer.h"
 
-namespace clmirror {
-	class RtlCodeGenerator;
-}
 
 namespace clmirror 
 {

@@ -9,7 +9,7 @@ namespace clmirror
         :m_srcFile(pSrcFile)
     { }
 
-    void RtlCodeGenerator::addRtlRecord(const RtlFunction & pFnMeta) const
+    void RtlCodeGenerator::addRtlRecord(const RtlFunction & pFnMeta)
     {
         auto& userType = [&]()-> RtlRecord&
         {
@@ -33,7 +33,7 @@ namespace clmirror
 
 
     void RtlCodeGenerator::addFunction(MetaKind pMetaKind, const std::string& pHeaderFile, const std::string& pRecord,
-                                       const std::string& pFnName, const std::vector<std::string>& pParamTypes) const
+                                       const std::string& pFnName, const std::vector<std::string>& pParamTypes)
     {
         if (pMetaKind == MetaKind::NonMemberFn)
         {

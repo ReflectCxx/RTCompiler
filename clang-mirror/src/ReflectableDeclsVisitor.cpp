@@ -107,7 +107,7 @@ namespace clmirror
 				functionName = pFnDecl->getQualifiedNameAsString();
 			}
 
-			auto& codegen = RtlCodeManager::Instance().getCodeGenerator(m_srcFile);
+			auto& codegen = RtlCodeManager::instance().getCodeGenerator(m_srcFile);
 			const std::string recordStr = ReflectableDeclsUtils::extractParentTypeName(pFnDecl);
 
 			codegen.addFunction(metaKind, declSrcFile, recordStr, functionName, parmTypes);

@@ -30,10 +30,10 @@ namespace clmirror
 		RtlCodeManager& operator=(RtlCodeManager&&) = delete;
 		RtlCodeManager& operator=(const RtlCodeManager&) = delete;
 		
-		const RtlCodeGenerator& getCodeGenerator(const std::string& pSrcFile);
+		RtlCodeGenerator& getCodeGenerator(const std::string& pSrcFile);
 
-		static RtlCodeManager& Instance();
+		static RtlCodeManager& instance();
 
-		void generateRegistrationCode();
+		void dumpReflectionIds();
 	};
 }

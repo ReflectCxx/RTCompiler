@@ -17,7 +17,7 @@ namespace clmirror
     RtlCodeManager::~RtlCodeManager() 
     { }
 
-    RtlCodeManager& RtlCodeManager::Instance()
+    RtlCodeManager& RtlCodeManager::instance()
     {
         static RtlCodeManager instance;
         return instance;
@@ -101,12 +101,12 @@ namespace clmirror
     }
 
 
-    const RtlCodeGenerator& RtlCodeManager::getCodeGenerator(const std::string& pSrcFile)
+    RtlCodeGenerator& RtlCodeManager::getCodeGenerator(const std::string& pSrcFile)
     {
         static std::mutex mutex;
         std::lock_guard<std::mutex> lock(mutex);
 
-        auto& codegen = [&]()-> const RtlCodeGenerator&
+        auto& codegen = [&]()-> RtlCodeGenerator&
         {
             const auto& itr = m_codeGens.find(pSrcFile);
             if (itr == m_codeGens.end()) {
@@ -122,7 +122,7 @@ namespace clmirror
     }
 
 
-    void RtlCodeManager::generateRegistrationCode()
+    void RtlCodeManager::dumpReflectionIds()
     {
         {
             const std::string fileStr = std::filesystem::current_path().string() + "/" + std::string(META_ID_HEADER);

@@ -14,7 +14,7 @@ int main(int argc, const char** argv)
 
     if (clmirror::ClangDriver::compileSourceFiles(argc, argv))
     {
-        clmirror::RtlCodeManager::Instance().generateRegistrationCode();
+        clmirror::RtlCodeManager::instance().dumpReflectionIds();
     }
     else 
     {
