@@ -23,20 +23,17 @@ namespace clmirror
         return instance;
     }
 
-    RtlCodeGenerator& RtlCodeManager::initCodeGenerator(const std::string& pSrcFile)
-    {
-        static std::mutex mutex;
-        m_codeGens.emplace_back(RtlCodeGenerator(pSrcFile));
-        return m_codeGens.back();
-    }
-
     void RtlCodeManager::dumpMetadataIds(std::fstream& pOut)
     {
         pOut << "\n#pragma once"
                 "\n#include <string_view>\n"
                 "\nnamespace rtcl {\n";
-        printFreeFunctionIds(pOut);
-        printRecordTypeIds(pOut);
+        for (const auto& itr : m_codeGens) {
+            printFreeFunctionIds(itr.second.getFreeFunctionsMap(), pOut);
+        }
+        for (const auto& itr : m_codeGens) {
+            printRecordTypeIds(itr.second.getRecordsMap(), pOut);
+        }
         pOut << "\n}";
     }
 
@@ -45,15 +42,20 @@ namespace clmirror
         pOut << "\n#pragma once"
                 "\n#include <vector>\n"
                 "\nnamespace rtl { class Function; }\n"
-                "\nnamespace rtcl {\n";
-        printRegistrationDecls(pOut);
+                "\nnamespace rtcl {\n"
+                "\nnamespace " + std::string(NS_REGISTRATION) + " {"
+                "\n    " + std::string(DECL_INIT_REGIS) + "\n}\n";
+
+        for (const auto& itr : m_codeGens) {
+            printRegistrationDecls(itr.second.getRecordsMap(), pOut);
+        }
         pOut << "\n}";
     }
 
-    void RtlCodeManager::printFreeFunctionIds(std::fstream& pOut)
+    void RtlCodeManager::printFreeFunctionIds(const RtlFunctionsMap& pFunctionsMap, std::fstream& pOut)
     {
         std::unordered_set<std::string> seen;
-        for (auto it = m_metaFns.begin(); it != m_metaFns.end(); ++it)
+        for (auto it = pFunctionsMap.begin(); it != pFunctionsMap.end(); ++it)
         {
             const std::string& key = it->first;
             if (!seen.insert(key).second) {
@@ -64,12 +66,9 @@ namespace clmirror
     }
 
 
-    void RtlCodeManager::printRegistrationDecls(std::fstream& pOut)
+    void RtlCodeManager::printRegistrationDecls(const RtlRecordsMap& pRecodsMap, std::fstream& pOut)
     {
-        pOut << "\nnamespace " + std::string(NS_REGISTRATION) + " {"
-                "\n    " + std::string(DECL_INIT_REGIS) + "\n}\n";
-
-        for (const auto& itr : m_metaTypes) {
+        for (const auto& itr : pRecodsMap) {
 
             std::unordered_set<std::string> seen;
             const auto& methodMap = itr.second.methods;
@@ -80,9 +79,9 @@ namespace clmirror
     }
 
 
-    void RtlCodeManager::printRecordTypeIds(std::fstream& pOut)
+    void RtlCodeManager::printRecordTypeIds(const RtlRecordsMap& pRecodsMap, std::fstream& pOut)
     {
-        for (const auto& itr : m_metaTypes) {
+        for (const auto& itr : pRecodsMap) {
 
             std::unordered_set<std::string> seen;
             const auto& methodMap = itr.second.methods;
@@ -102,55 +101,24 @@ namespace clmirror
     }
 
 
-    void RtlCodeManager::addReflectionMetaAsRecord(const RtlFunction& pReflMeta)
-    {
-        auto& userType = [&]()-> RtlRecord&
-        {
-            const auto& itr = m_metaTypes.find(pReflMeta.m_record);
-            if (itr == m_metaTypes.end()) 
-            {
-                auto& userType = m_metaTypes.emplace(pReflMeta.m_record,
-                    RtlRecord{
-                        .typeStr = pReflMeta.m_record,
-                        .methods = RtlRecord::MemberFnsMap()
-                    }).first->second;
-                return userType;
-            }
-            else {
-                auto& userType = itr->second;
-                return userType;
-            }
-        }();
-        userType.methods.emplace(pReflMeta.m_function, pReflMeta);
-    }
-
-
-    void RtlCodeManager::addFunctionSignature(MetaKind pMetaKind, const std::string& pHeaderFile, const std::string& pRecord,
-                                              const std::string& pFunctionName, const std::vector<std::string>& pParmTypes)
+    const RtlCodeGenerator& RtlCodeManager::getCodeGenerator(const std::string& pSrcFile)
     {
         static std::mutex mutex;
         std::lock_guard<std::mutex> lock(mutex);
 
-        if (pMetaKind == MetaKind::NonMemberFn)
+        auto& codegen = [&]()-> const RtlCodeGenerator&
         {
-            m_metaFns.emplace(pFunctionName, (RtlFunction{
-                    .m_metaKind = pMetaKind,
-                    .m_header = pHeaderFile,
-                    .m_record = pRecord,
-                    .m_function = pFunctionName,
-                    .m_argTypes = pParmTypes
-            }));
-        }
-        else if (pMetaKind != MetaKind::None)
-        {
-            addReflectionMetaAsRecord(RtlFunction{
-                    .m_metaKind = pMetaKind,
-                    .m_header = pHeaderFile,
-                    .m_record = pRecord,
-                    .m_function = pFunctionName,
-                    .m_argTypes = pParmTypes
-            });
-        }
+            const auto& itr = m_codeGens.find(pSrcFile);
+            if (itr == m_codeGens.end()) {
+                auto& codegen = m_codeGens.emplace(pSrcFile, RtlCodeGenerator(pSrcFile)).first->second;
+                return codegen;
+            }
+            else {
+                auto& codegen = itr->second;
+                return codegen;
+            }
+        }();
+        return codegen;
     }
 
 
@@ -191,6 +159,6 @@ namespace clmirror
             }
             Logger::out("generated file : " + fileStr);
         }
-        Logger::out("Number of reflectable types generated: " + std::to_string(m_metaTypes.size()));
+        Logger::out("Number of reflectable entities generated: " + std::to_string(m_codeGens.size()));
     }
 }

@@ -1,12 +1,9 @@
 #pragma once
 
-#include <vector>
 #include <string>
 #include <unordered_map>
 
 namespace clmirror {
-	struct RtlRecord;
-	struct RtlFunction;
 	class RtlCodeGenerator;
 }
 
@@ -14,24 +11,17 @@ namespace clmirror
 {
 	class RtlCodeManager
 	{
-		std::vector<RtlCodeGenerator> m_codeGens;
-		std::unordered_map<std::string, RtlRecord> m_metaTypes;
-		std::unordered_multimap<std::string, RtlFunction> m_metaFns;
+		std::unordered_map<std::string, RtlCodeGenerator> m_codeGens;
+
+		void dumpMetadataIds(std::fstream& pOut);
+		void dumpRegistrationDecls(std::fstream& pOut);
+
+		static void printRecordTypeIds(const RtlRecordsMap& pRecodsMap, std::fstream& pOut);
+		static void printFreeFunctionIds(const RtlFunctionsMap& pFunctionsMap, std::fstream& pOut);
+		static void printRegistrationDecls(const RtlRecordsMap& pRecodsMap, std::fstream& pOut);
 
 		RtlCodeManager();
 		~RtlCodeManager();
-
-		void printRecordTypeIds(std::fstream& pOut);
-
-		void printFreeFunctionIds(std::fstream& pOut);
-
-		void printRegistrationDecls(std::fstream& pOut);
-
-		void addReflectionMetaAsRecord(const RtlFunction& pReflMeta);
-
-		void dumpMetadataIds(std::fstream& pOut);
-
-		void dumpRegistrationDecls(std::fstream& pOut);
 
 	public:
 
@@ -40,12 +30,9 @@ namespace clmirror
 		RtlCodeManager& operator=(RtlCodeManager&&) = delete;
 		RtlCodeManager& operator=(const RtlCodeManager&) = delete;
 		
-		RtlCodeGenerator& initCodeGenerator(const std::string& pSrcFile);
+		const RtlCodeGenerator& getCodeGenerator(const std::string& pSrcFile);
 
 		static RtlCodeManager& Instance();
-
-		void addFunctionSignature(MetaKind pMetaKind, const std::string& pHeaderFile, const std::string& pRecord,
-								  const std::string& pFunctionName, const std::vector<std::string>& pParmTypes);
 
 		void generateRegistrationCode();
 	};

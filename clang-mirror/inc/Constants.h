@@ -5,6 +5,7 @@
 #include <vector>
 #include <chrono>
 #include <string_view>
+#include <unordered_map>
 
 namespace clmirror {
 
@@ -56,6 +57,12 @@ namespace clmirror
 		MemberFnStatic,
 		MemberFnNonConst
 	};
+
+	struct RtlRecord;
+	struct RtlFunction;
+
+	using RtlRecordsMap = std::unordered_map<std::string, RtlRecord>;
+	using RtlFunctionsMap = std::unordered_multimap<std::string, RtlFunction>;
 }
 
 

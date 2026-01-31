@@ -8,6 +8,7 @@
 
 #include "Logger.h"
 #include "Constants.h"
+#include "RtlCodeManager.h"
 #include "ClangReflectDiagnosticConsumer.h"
 #include "ClangReflectActionFactory.h"
 

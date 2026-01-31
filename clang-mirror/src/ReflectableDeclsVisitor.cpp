@@ -13,8 +13,8 @@ using namespace clang;
 
 namespace clmirror
 {
-	ReflectableDeclsVisitor::ReflectableDeclsVisitor(const std::string& pCurrentSrcFile)
-		: m_codegen(RtlCodeManager::Instance().initCodeGenerator(pCurrentSrcFile))
+	ReflectableDeclsVisitor::ReflectableDeclsVisitor(const std::string& pSrcFile)
+		: m_srcFile(pSrcFile)
 	{ }
 
 
@@ -40,7 +40,7 @@ namespace clmirror
 			return true;
 		}
 
-		if (!ReflectableDeclsUtils::isDeclFrmCurrentSource(m_codegen.getSrcFile(), pFnDecl)) {
+		if (!ReflectableDeclsUtils::isDeclFrmCurrentSource(m_srcFile, pFnDecl)) {
 			return true;
 		}
 
@@ -106,8 +106,11 @@ namespace clmirror
 				metaKind = MetaKind::NonMemberFn;
 				functionName = pFnDecl->getQualifiedNameAsString();
 			}
+
+			auto& codegen = RtlCodeManager::Instance().getCodeGenerator(m_srcFile);
 			const std::string recordStr = ReflectableDeclsUtils::extractParentTypeName(pFnDecl);
-			RtlCodeManager::Instance().addFunctionSignature(metaKind, declSrcFile, recordStr, functionName, parmTypes);
+
+			codegen.addFunction(metaKind, declSrcFile, recordStr, functionName, parmTypes);
 		}
 		return true;
 	}

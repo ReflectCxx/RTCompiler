@@ -7,6 +7,10 @@ namespace clang::tooling {
 	class CompilationDatabase;
 }
 
+namespace clmirror {
+	class RtlCodeGenerator;
+}
+
 namespace clmirror
 {
 	class ASTParser

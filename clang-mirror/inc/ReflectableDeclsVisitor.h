@@ -11,11 +11,10 @@ namespace clmirror {
 
     class ReflectableDeclsVisitor : public clang::RecursiveASTVisitor<ReflectableDeclsVisitor>
     {
-        RtlCodeGenerator& m_codegen;
-
+        const std::string m_srcFile;
     public:
 
-        ReflectableDeclsVisitor(const std::string& pCurrentSrcFile);
+        ReflectableDeclsVisitor(const std::string& pSrcFile);
 
         bool VisitFunctionDecl(clang::FunctionDecl* pFuncDecl);
     };
