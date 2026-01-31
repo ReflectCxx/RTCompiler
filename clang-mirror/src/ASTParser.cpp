@@ -8,7 +8,7 @@
 
 #include "Logger.h"
 #include "Constants.h"
-#include "RtlCodeManager.h"
+#include "ASTCodeManager.h"
 #include "ClangReflectDiagnosticConsumer.h"
 #include "ClangReflectActionFactory.h"
 
@@ -21,7 +21,7 @@ namespace clmirror
 {
 	ASTParser::ASTParser(const std::vector<std::string>& pFiles,
 					     clang::tooling::CompilationDatabase& pCdb)
-		: m_files(pFiles)
+		: m_srcFiles(pFiles)
 		, m_compileDb(pCdb)
 	{ }
 
@@ -30,7 +30,7 @@ namespace clmirror
 	{
 		for (size_t index = pStartIndex; index <= pEndIndex; index++)
 		{
-			const auto& srcFilePath = m_files.at(index).c_str();
+			const auto& srcFilePath = m_srcFiles.at(index).c_str();
 
 			Logger::outProgress("compiling: " + std::string(srcFilePath));
 
@@ -64,7 +64,11 @@ namespace clmirror
 
 			auto missingHeaderErrors = diagConsumer.getMissingHeaderMsgs();
 			Logger::outReflectError(srcFilePath, std::vector<std::string>(), missingHeaderErrors);
+
+			//Check for errors, then only dump registration.
+			ASTCodeManager::instance().dumpRegistrations(srcFilePath, index);
 		}
+
 		return 0;
 	}
 }

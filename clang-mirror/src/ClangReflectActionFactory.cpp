@@ -3,7 +3,7 @@
 #include <unordered_set>
 
 #include "ClangReflectActionFactory.h"
-#include "ReflectableDeclsVisitor.h"
+#include "ASTVisitor.h"
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "ASTParser.h"
@@ -24,7 +24,7 @@ namespace {
 
 		virtual void HandleTranslationUnit(clang::ASTContext& Context)
 		{
-			clmirror::ReflectableDeclsVisitor visitor(m_currentSrcFile);
+			clmirror::ASTVisitor visitor(m_currentSrcFile);
 			visitor.TraverseDecl(Context.getTranslationUnitDecl());
 		}
 	};

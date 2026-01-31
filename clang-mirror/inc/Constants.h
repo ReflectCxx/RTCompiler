@@ -25,11 +25,12 @@ namespace clmirror {
 	inline constexpr std::string_view ENUM = "enum";
 	inline constexpr std::string_view CLASS = "class";
 	inline constexpr std::string_view STRUCT = "struct";
-
-	inline constexpr std::string_view INC_MANAGERS_DATA = "incManagersData.txt";
 	
-	inline constexpr std::string_view META_ID_HEADER = "rtcl_meta_ids.h";
-	inline constexpr std::string_view REGISTRATION_HEADER = "rtcl_registration.h";
+	inline constexpr std::string_view FILE_REG_IDS = "rtl_registered_ids.h";
+	inline constexpr std::string_view FILE_REG_DECLS = "rtl_registrations.h";
+	inline constexpr std::string_view FILE_REG_PREFIX = "rtl_registrations_";
+	inline constexpr std::string_view FILE_CXX_MIRROR_H = "cxx_mirror.h";
+	inline constexpr std::string_view FILE_CXX_MIRROR_S = "cxx_mirror.cpp";
 
 	inline constexpr std::string_view NS_TYPE = "type";
 	inline constexpr std::string_view NS_METHOD = "method";
@@ -58,11 +59,11 @@ namespace clmirror
 		MemberFnNonConst
 	};
 
-	struct RtlRecord;
-	struct RtlFunction;
+	struct ASTMetaType;
+	struct ASTMetaFn;
 
-	using RtlRecordsMap = std::unordered_map<std::string, RtlRecord>;
-	using RtlFunctionsMap = std::unordered_multimap<std::string, RtlFunction>;
+	using RtlRecordsMap = std::unordered_map<std::string, ASTMetaType>;
+	using RtlFunctionsMap = std::unordered_multimap<std::string, ASTMetaFn>;
 }
 
 

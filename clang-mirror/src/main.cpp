@@ -6,7 +6,7 @@
 #include "Constants.h"
 #include "Logger.h"
 #include "ClangDriver.h"
-#include "RtlCodeManager.h"
+#include "ASTCodeManager.h"
 
 int main(int argc, const char** argv)
 {
@@ -14,7 +14,7 @@ int main(int argc, const char** argv)
 
     if (clmirror::ClangDriver::compileSourceFiles(argc, argv))
     {
-        clmirror::RtlCodeManager::instance().dumpReflectionIds();
+        clmirror::ASTCodeManager::instance().dumpReflectionIds();
     }
     else 
     {

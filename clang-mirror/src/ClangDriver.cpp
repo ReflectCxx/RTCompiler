@@ -98,7 +98,7 @@ namespace clmirror
         Logger::resetDoneCounter(fileCount);
 
         //TODO: get the number of threads from command line
-        const int numCores = 0; //*/std::thread::hardware_concurrency() - 2;
+        const int numCores = /*0; //*/std::thread::hardware_concurrency() - 2;
         const int numThreads = (numCores <= 0 ? 1 : numCores);
 
         int endIndex = 0;

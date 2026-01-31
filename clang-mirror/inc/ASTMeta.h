@@ -10,7 +10,7 @@
 
 namespace clmirror
 {
-    struct RtlFunction
+    struct ASTMetaFn
     {
         MetaKind m_metaKind;
 		
@@ -26,9 +26,9 @@ namespace clmirror
         std::string toFunctionIdentifierSyntax() const;
     };
 
-    struct RtlRecord
+    struct ASTMetaType
     {
-        using MemberFnsMap = std::unordered_multimap<std::string, clmirror::RtlFunction>;
+        using MemberFnsMap = std::unordered_multimap<std::string, clmirror::ASTMetaFn>;
         
         std::string typeStr;
         MemberFnsMap methods;

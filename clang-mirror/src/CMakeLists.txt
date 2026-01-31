@@ -5,12 +5,12 @@ set(CLREFLECT_SRCS
 	"${CMAKE_CURRENT_LIST_DIR}/ClangReflectActionFactory.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/ClangReflectDiagnosticConsumer.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/main.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectableDeclsUtils.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectableDeclsVisitor.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTDeclsUtils.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTVisitor.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/Logger.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectionMeta.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/RtlCodeManager.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/RtlCodeGenerator.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTMeta.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTCodeManager.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTCodeGenerator.cpp"
     # Add more source files as needed
 )
 

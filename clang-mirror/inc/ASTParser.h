@@ -8,14 +8,14 @@ namespace clang::tooling {
 }
 
 namespace clmirror {
-	class RtlCodeGenerator;
+	class ASTCodeGenerator;
 }
 
 namespace clmirror
 {
 	class ASTParser
 	{
-		const std::vector<std::string>& m_files;
+		const std::vector<std::string>& m_srcFiles;
 		
 		clang::tooling::CompilationDatabase& m_compileDb;
 

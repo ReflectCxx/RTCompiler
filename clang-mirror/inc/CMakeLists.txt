@@ -5,14 +5,14 @@ set(CLREFLECT_INCS
     "${CMAKE_CURRENT_LIST_DIR}/ClangDriver.h"
 	"${CMAKE_CURRENT_LIST_DIR}/ClangReflectActionFactory.h"
 	"${CMAKE_CURRENT_LIST_DIR}/ClangReflectDiagnosticConsumer.h"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectableDeclsUtils.h"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectableDeclsVisitor.h"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTDeclsUtils.h"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTVisitor.h"
 	"${CMAKE_CURRENT_LIST_DIR}/Logger.h"
 	"${CMAKE_CURRENT_LIST_DIR}/Constants.h"
 	"${CMAKE_CURRENT_LIST_DIR}/StringUtils.h"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectionMeta.h"
-	"${CMAKE_CURRENT_LIST_DIR}/RtlCodeManager.h"
-	"${CMAKE_CURRENT_LIST_DIR}/RtlCodeGenerator.h"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTMeta.h"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTCodeManager.h"
+	"${CMAKE_CURRENT_LIST_DIR}/ASTCodeGenerator.h"
 )
 
 # Add headers to the library target

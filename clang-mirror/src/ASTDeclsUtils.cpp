@@ -1,14 +1,14 @@
 
 #include "Constants.h"
 #include "StringUtils.h"
-#include "ReflectableDeclsUtils.h"
+#include "ASTDeclsUtils.h"
 #include "clang/AST/RecursiveASTVisitor.h"
 
 using namespace clang;
 
 namespace clmirror 
 {
-    bool ReflectableDeclsUtils::isInUserCode(NamedDecl* pDecl)
+    bool ASTDeclsUtils::isInUserCode(NamedDecl* pDecl)
     {
         if (!pDecl) {
             return false;
@@ -28,7 +28,7 @@ namespace clmirror
     }
 	
 	
-    bool ReflectableDeclsUtils::isMemberFunctionOrInNamespace(clang::FunctionDecl* pFnDecl)
+    bool ASTDeclsUtils::isMemberFunctionOrInNamespace(clang::FunctionDecl* pFnDecl)
     {
         if (llvm::isa<clang::CXXRecordDecl>(pFnDecl->getParent())) {
             return true;
@@ -44,7 +44,7 @@ namespace clmirror
     }
 
 
-	bool ReflectableDeclsUtils::isDeclFrmCurrentSource(const std::string& pCurSrcFile, clang::Decl* pDecl)
+	bool ASTDeclsUtils::isDeclFrmCurrentSource(const std::string& pCurSrcFile, clang::Decl* pDecl)
     {
         std::string currentSrcFile = pCurSrcFile;
         std::transform(currentSrcFile.begin(), currentSrcFile.end(), currentSrcFile.begin(),
@@ -63,7 +63,7 @@ namespace clmirror
     }
 
 
-    std::string ReflectableDeclsUtils::extractParentTypeName(clang::FunctionDecl* pFnDecl)
+    std::string ASTDeclsUtils::extractParentTypeName(clang::FunctionDecl* pFnDecl)
     {
         const auto* method = llvm::dyn_cast<clang::CXXMethodDecl>(pFnDecl);
         if (!method)
@@ -83,7 +83,7 @@ namespace clmirror
         return os.str();
     }
 	
-    std::string ReflectableDeclsUtils::extractParameterType(clang::ParmVarDecl* pParmVarDecl)
+    std::string ASTDeclsUtils::extractParameterType(clang::ParmVarDecl* pParmVarDecl)
     {
         std::unordered_map<std::string, std::string> templateArgsTypeDefs;
         auto typedefStrValue = getTypeDefAliasForType(pParmVarDecl->getOriginalType(), templateArgsTypeDefs);
@@ -119,7 +119,7 @@ namespace clmirror
     }
 
 
-    const std::optional<std::string> ReflectableDeclsUtils::getTypeDefAliasForType(const QualType& pQType, std::unordered_map<std::string, std::string>& pTemplateTypeDefs)
+    const std::optional<std::string> ASTDeclsUtils::getTypeDefAliasForType(const QualType& pQType, std::unordered_map<std::string, std::string>& pTemplateTypeDefs)
     {
         const Type* type = pQType.getTypePtrOrNull();
         if (!type) {

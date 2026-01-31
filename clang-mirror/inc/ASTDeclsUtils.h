@@ -9,7 +9,7 @@
 
 namespace clmirror {
 
-    struct ReflectableDeclsUtils
+    struct ASTDeclsUtils
     {
         static bool isInUserCode(clang::NamedDecl* pNameDecl);
         static bool isDeclFrmCurrentSource(const std::string& pCurSrcFile, clang::Decl* pDecl);

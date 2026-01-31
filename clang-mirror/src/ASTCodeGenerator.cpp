@@ -1,25 +1,25 @@
 
 
-#include "ReflectionMeta.h"
-#include "RTLCodeGenerator.h"
+#include "ASTMeta.h"
+#include "ASTCodeGenerator.h"
 
-namespace clmirror 
+namespace clmirror
 {
-    RtlCodeGenerator::RtlCodeGenerator(const std::string& pSrcFile)
+    ASTCodeGenerator::ASTCodeGenerator(const std::string& pSrcFile)
         :m_srcFile(pSrcFile)
     { }
 
-    void RtlCodeGenerator::addRtlRecord(const RtlFunction & pFnMeta)
+    void ASTCodeGenerator::addRtlRecord(const ASTMetaFn & pFnMeta)
     {
-        auto& userType = [&]()-> RtlRecord&
+        auto& userType = [&]()-> ASTMetaType&
         {
             const auto& itr = m_recordsMap.find(pFnMeta.m_record);
             if (itr == m_recordsMap.end())
             {
                 auto& userType = m_recordsMap.emplace(pFnMeta.m_record,
-                    RtlRecord{
+                    ASTMetaType{
                         .typeStr = pFnMeta.m_record,
-                        .methods = RtlRecord::MemberFnsMap()
+                        .methods = ASTMetaType::MemberFnsMap()
                     }).first->second;
                 return userType;
             }
@@ -32,12 +32,12 @@ namespace clmirror
     }
 
 
-    void RtlCodeGenerator::addFunction(MetaKind pMetaKind, const std::string& pHeaderFile, const std::string& pRecord,
+    void ASTCodeGenerator::addFunction(MetaKind pMetaKind, const std::string& pHeaderFile, const std::string& pRecord,
                                        const std::string& pFnName, const std::vector<std::string>& pParamTypes)
     {
         if (pMetaKind == MetaKind::NonMemberFn)
         {
-            m_freeFnsMap.emplace(pFnName, (RtlFunction{
+            m_freeFnsMap.emplace(pFnName, (ASTMetaFn{
                     .m_metaKind = pMetaKind,
                     .m_header = pHeaderFile,
                     .m_record = pRecord,
@@ -47,7 +47,7 @@ namespace clmirror
         }
         else if (pMetaKind != MetaKind::None)
         {
-            addRtlRecord( RtlFunction{
+            addRtlRecord( ASTMetaFn{
                     .m_metaKind = pMetaKind,
                     .m_header = pHeaderFile,
                     .m_record = pRecord,

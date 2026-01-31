@@ -5,39 +5,43 @@
 #include <unordered_set>
 
 #include "Logger.h"
-#include "ReflectionMeta.h"
-#include "RtlCodeManager.h"
-#include "RtlCodeGenerator.h"
+#include "ASTMeta.h"
+#include "ASTCodeManager.h"
+#include "ASTCodeGenerator.h"
 
 namespace clmirror 
 {
-    RtlCodeManager::RtlCodeManager() 
+    ASTCodeManager::ASTCodeManager() 
     { }
 
-    RtlCodeManager::~RtlCodeManager() 
-    { }
+    ASTCodeManager::~ASTCodeManager() 
+    { 
+        for (auto& itr : m_codeGens) {
+            delete itr.second;
+        }
+    }
 
-    RtlCodeManager& RtlCodeManager::instance()
+    ASTCodeManager& ASTCodeManager::instance()
     {
-        static RtlCodeManager instance;
+        static ASTCodeManager instance;
         return instance;
     }
 
-    void RtlCodeManager::dumpMetadataIds(std::fstream& pOut)
+    void ASTCodeManager::dumpMetadataIds(std::fstream& pOut)
     {
         pOut << "\n#pragma once"
                 "\n#include <string_view>\n"
                 "\nnamespace rtcl {\n";
         for (const auto& itr : m_codeGens) {
-            printFreeFunctionIds(itr.second.getFreeFunctionsMap(), pOut);
+            printFreeFunctionIds(itr.second->getFreeFunctionsMap(), pOut);
         }
         for (const auto& itr : m_codeGens) {
-            printRecordTypeIds(itr.second.getRecordsMap(), pOut);
+            printRecordTypeIds(itr.second->getRecordsMap(), pOut);
         }
         pOut << "\n}";
     }
 
-    void RtlCodeManager::dumpRegistrationDecls(std::fstream& pOut)
+    void ASTCodeManager::dumpRegistrationDecls(std::fstream& pOut)
     {
         pOut << "\n#pragma once"
                 "\n#include <vector>\n"
@@ -47,12 +51,12 @@ namespace clmirror
                 "\n    " + std::string(DECL_INIT_REGIS) + "\n}\n";
 
         for (const auto& itr : m_codeGens) {
-            printRegistrationDecls(itr.second.getRecordsMap(), pOut);
+            printRegistrationDecls(itr.second->getRecordsMap(), pOut);
         }
         pOut << "\n}";
     }
 
-    void RtlCodeManager::printFreeFunctionIds(const RtlFunctionsMap& pFunctionsMap, std::fstream& pOut)
+    void ASTCodeManager::printFreeFunctionIds(const RtlFunctionsMap& pFunctionsMap, std::fstream& pOut)
     {
         std::unordered_set<std::string> seen;
         for (auto it = pFunctionsMap.begin(); it != pFunctionsMap.end(); ++it)
@@ -66,7 +70,7 @@ namespace clmirror
     }
 
 
-    void RtlCodeManager::printRegistrationDecls(const RtlRecordsMap& pRecodsMap, std::fstream& pOut)
+    void ASTCodeManager::printRegistrationDecls(const RtlRecordsMap& pRecodsMap, std::fstream& pOut)
     {
         for (const auto& itr : pRecodsMap) {
 
@@ -79,7 +83,7 @@ namespace clmirror
     }
 
 
-    void RtlCodeManager::printRecordTypeIds(const RtlRecordsMap& pRecodsMap, std::fstream& pOut)
+    void ASTCodeManager::printRecordTypeIds(const RtlRecordsMap& pRecodsMap, std::fstream& pOut)
     {
         for (const auto& itr : pRecodsMap) {
 
@@ -101,31 +105,69 @@ namespace clmirror
     }
 
 
-    RtlCodeGenerator& RtlCodeManager::getCodeGenerator(const std::string& pSrcFile)
+    ASTCodeGenerator* ASTCodeManager::getCodeGenerator(const std::string& pSrcFile, bool pCreate /*= false*/)
     {
         static std::mutex mutex;
         std::lock_guard<std::mutex> lock(mutex);
 
-        auto& codegen = [&]()-> RtlCodeGenerator&
-        {
+        if (pCreate) {
+            auto codegen = [&]()-> ASTCodeGenerator*
+            {
+                const auto& itr = m_codeGens.find(pSrcFile);
+                if (itr == m_codeGens.end()) 
+                {
+                    auto codegen = new ASTCodeGenerator(pSrcFile);
+                    m_codeGens.insert(std::make_pair(pSrcFile, codegen));
+                    return codegen;
+                }
+                else {
+                    auto& codegen = itr->second;
+                    return codegen;
+                }
+            }();
+            return codegen;
+        }
+        else {
             const auto& itr = m_codeGens.find(pSrcFile);
-            if (itr == m_codeGens.end()) {
-                auto& codegen = m_codeGens.emplace(pSrcFile, RtlCodeGenerator(pSrcFile)).first->second;
-                return codegen;
-            }
-            else {
-                auto& codegen = itr->second;
-                return codegen;
-            }
-        }();
-        return codegen;
+            return (itr != m_codeGens.end() ? itr->second : nullptr);
+        }
     }
 
 
-    void RtlCodeManager::dumpReflectionIds()
+    void ASTCodeManager::dumpRegistrations(const std::string& pSrcFile, std::size_t pIndex)
+    {
+        auto codegen = getCodeGenerator(pSrcFile);
+        if (codegen != nullptr) 
+        {
+            std::string filePath = std::filesystem::current_path().string() + "/";
+            filePath.append(std::string(FILE_REG_PREFIX) + std::to_string(pIndex) + ".cpp");
+
+            std::fstream fout(filePath, std::ios::out);
+            if (!fout.is_open()) {
+                Logger::outException("Error opening file for writing!");
+                return;
+            }
+
+            fout << "\n"
+                    "\n#include \"" << std::string(FILE_REG_IDS) << "\""
+                    "\n#include \"" << std::string(FILE_REG_DECLS) << "\"";
+
+            fout.flush();
+            fout.close();
+
+            if (fout.fail() || fout.bad()) {
+                Logger::outException("Error closing file:" + std::string(FILE_REG_IDS));
+                return;
+            }
+            Logger::out("generated file : " + filePath);
+        }
+    }
+
+
+    void ASTCodeManager::dumpReflectionIds()
     {
         {
-            const std::string fileStr = std::filesystem::current_path().string() + "/" + std::string(META_ID_HEADER);
+            const std::string fileStr = std::filesystem::current_path().string() + "/" + std::string(FILE_REG_IDS);
             std::fstream fout(fileStr, std::ios::out);
             if (!fout.is_open()) {
                 Logger::outException("Error opening file for writing!");
@@ -137,12 +179,12 @@ namespace clmirror
             fout.close();
 
             if (fout.fail() || fout.bad()) {
-                Logger::outException("Error closing file:" + std::string(META_ID_HEADER));
+                Logger::outException("Error closing file:" + std::string(FILE_REG_IDS));
                 return;
             }
             Logger::out("generated file : " + fileStr);
         } {
-            const std::string fileStr = std::filesystem::current_path().string() + "/" + std::string(REGISTRATION_HEADER);
+            const std::string fileStr = std::filesystem::current_path().string() + "/" + std::string(FILE_REG_DECLS);
             std::fstream fout(fileStr, std::ios::out);
             if (!fout.is_open()) {
                 Logger::outException("Error opening file for writing!");
@@ -154,7 +196,7 @@ namespace clmirror
             fout.close();
 
             if (fout.fail() || fout.bad()) {
-                Logger::outException("Error closing file:" + std::string(META_ID_HEADER));
+                Logger::outException("Error closing file:" + std::string(FILE_REG_IDS));
                 return;
             }
             Logger::out("generated file : " + fileStr);

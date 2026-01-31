@@ -4,23 +4,23 @@
 
 #include "Constants.h"
 #include "StringUtils.h"
-#include "RtlCodeManager.h"
-#include "RtlCodeGenerator.h"
-#include "ReflectableDeclsUtils.h"
-#include "ReflectableDeclsVisitor.h"
+#include "ASTCodeManager.h"
+#include "ASTCodeGenerator.h"
+#include "ASTDeclsUtils.h"
+#include "ASTVisitor.h"
 
 using namespace clang;
 
 namespace clmirror
 {
-	ReflectableDeclsVisitor::ReflectableDeclsVisitor(const std::string& pSrcFile)
+	ASTVisitor::ASTVisitor(const std::string& pSrcFile)
 		: m_srcFile(pSrcFile)
 	{ }
 
 
-	bool ReflectableDeclsVisitor::VisitFunctionDecl(FunctionDecl* pFnDecl)
+	bool ASTVisitor::VisitFunctionDecl(FunctionDecl* pFnDecl)
 	{
-		if (!ReflectableDeclsUtils::isInUserCode(pFnDecl) ||
+		if (!ASTDeclsUtils::isInUserCode(pFnDecl) ||
 			pFnDecl->isDeleted() ||
 			pFnDecl->isInAnonymousNamespace() ||
 			(pFnDecl->isGlobal() && pFnDecl->isStatic()) ||
@@ -40,7 +40,7 @@ namespace clmirror
 			return true;
 		}
 
-		if (!ReflectableDeclsUtils::isDeclFrmCurrentSource(m_srcFile, pFnDecl)) {
+		if (!ASTDeclsUtils::isDeclFrmCurrentSource(m_srcFile, pFnDecl)) {
 			return true;
 		}
 
@@ -76,7 +76,7 @@ namespace clmirror
 					//m_unreflectedFunctions.push_back(fnQName);
 					return true;
 				}
-				parmTypes.push_back(ReflectableDeclsUtils::extractParameterType(params[index]));
+				parmTypes.push_back(ASTDeclsUtils::extractParameterType(params[index]));
 			}
 
 			std::string functionName;
@@ -107,10 +107,10 @@ namespace clmirror
 				functionName = pFnDecl->getQualifiedNameAsString();
 			}
 
-			auto& codegen = RtlCodeManager::instance().getCodeGenerator(m_srcFile);
-			const std::string recordStr = ReflectableDeclsUtils::extractParentTypeName(pFnDecl);
+			auto codegen = ASTCodeManager::instance().getCodeGenerator(m_srcFile, true);
+			const std::string recordStr = ASTDeclsUtils::extractParentTypeName(pFnDecl);
 
-			codegen.addFunction(metaKind, declSrcFile, recordStr, functionName, parmTypes);
+			codegen->addFunction(metaKind, declSrcFile, recordStr, functionName, parmTypes);
 		}
 		return true;
 	}
