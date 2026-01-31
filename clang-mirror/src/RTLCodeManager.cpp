@@ -59,6 +59,9 @@ namespace clmirror
 
     void RTLCodeManager::printRegistrationDecls(std::fstream& pOut)
     {
+        pOut << "\nnamespace " + std::string(NS_REGISTRATION) + " {"
+                "\n    " + std::string(DECL_INIT_REGIS) + "\n}";
+
         for (const auto& itr : m_metaTypes) {
 
             std::unordered_set<std::string> seen;

@@ -18,6 +18,7 @@ namespace clmirror
         std::string m_function;
 		
         std::vector<std::string> m_argTypes;
+        
         std::string toRegistrationDeclSyntax() const;
         std::string toRecordIdentifierSyntax() const;
         std::string toMethodIdentifierSyntax() const;

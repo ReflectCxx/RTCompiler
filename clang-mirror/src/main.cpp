@@ -21,8 +21,9 @@ int main(int argc, const char** argv)
         clmirror::Logger::outException("\n[clang-mirror failed]");
     }
 
-    std::cout << clmirror::RESET << std::endl;
+    std::cout << clmirror::RESET << std::flush;
     const auto& tsEnd = std::chrono::duration_cast<clmirror::Second> (clmirror::Clock::now() - tsBegin).count();
     clmirror::Logger::out("Total time elapsed: " + std::to_string(tsEnd) + "\n");
+
     return 0;
 }

@@ -43,7 +43,7 @@ namespace clmirror
             syntaxStr.append("\nnamespace " + typeStr + " {");
         }
 
-        syntaxStr.append("\nnamespace " + std::string(NS_METHOD) + "{")
+        syntaxStr.append("\nnamespace " + std::string(NS_METHOD) + " {")
                  .append("\n    inline constexpr std::string_view ")
                  .append(m_function)
                  .append(" = \"")
@@ -85,19 +85,19 @@ namespace clmirror
     {
         std::vector<std::string> typenames = splitQualifiedName(m_record);
 
-        std::string syntaxStr = "\nnamespace " + std::string(NS_TYPE) + " {";
+        std::string syntaxStr = "\nnamespace " + std::string(NS_REGISTRATION) + " {"
+                                "\nnamespace " + std::string(NS_TYPE) + " {";
+
         for (const auto& typeStr : typenames) {
             syntaxStr.append("\nnamespace " + typeStr + " {");
         }
 
-        syntaxStr.append("\nnamespace " + std::string(NS_REGISTRATION) + "{")
-            .append("\n    static void init(std::vector<rtl::Function>& fns);\n")
-            .append("}");
+        syntaxStr.append("\n    " + std::string(DECL_INIT_REGIS) + "\n");
 
         for (auto& _ : typenames) {
             syntaxStr.append("}");
         }
-        syntaxStr.append("}");
+        syntaxStr.append("}}");
         return syntaxStr;
     }
 }
