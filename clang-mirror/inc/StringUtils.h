@@ -21,9 +21,9 @@ namespace clmirror {
 		} while (pos != std::string::npos);
 	}
 
-	static void removeSubStrings(std::string& pSrcStr, const std::vector<std::string>& pKeyStrs)
+	static void removeSubStrings(std::string& pSrcStr, const std::vector<std::string_view>& pKeyStrs)
 	{
-		for (const std::string& keyStr : pKeyStrs)
+		for (const auto& keyStr : pKeyStrs)
 		{
 			if (!keyStr.empty())
 			{

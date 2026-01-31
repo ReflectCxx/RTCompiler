@@ -4,7 +4,7 @@
 
 #include "Constants.h"
 #include "StringUtils.h"
-#include "ReflectableInterface.h"
+#include "RTLCodeManager.h"
 #include "ReflectableDeclsUtils.h"
 #include "ReflectableDeclsVisitor.h"
 
@@ -107,8 +107,8 @@ namespace clmirror
 				functionName = pFnDecl->getQualifiedNameAsString();
 			}
 			const std::string recordStr = ReflectableDeclsUtils::extractParentTypeName(pFnDecl);
-			ReflectableInterface::Instance().addFunctionSignature(metaKind, m_currentSrcFile, declSrcFile,
-																  recordStr, functionName, parmTypes);
+			RTLCodeManager::Instance().addFunctionSignature(metaKind, m_currentSrcFile, declSrcFile,
+														    recordStr, functionName, parmTypes);
 		}
 		return true;
 	}

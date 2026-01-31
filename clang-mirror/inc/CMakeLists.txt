@@ -11,7 +11,7 @@ set(CLREFLECT_INCS
 	"${CMAKE_CURRENT_LIST_DIR}/Constants.h"
 	"${CMAKE_CURRENT_LIST_DIR}/StringUtils.h"
 	"${CMAKE_CURRENT_LIST_DIR}/ReflectionMeta.h"
-	"${CMAKE_CURRENT_LIST_DIR}/ReflectableInterface.h"
+	"${CMAKE_CURRENT_LIST_DIR}/RTLCodeManager.h"
 )
 
 # Add headers to the library target
