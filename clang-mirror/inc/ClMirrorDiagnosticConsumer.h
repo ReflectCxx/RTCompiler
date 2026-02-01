@@ -6,7 +6,7 @@
 
 namespace clmirror {
 
-	class ClangReflectDiagnosticConsumer : public clang::tidy::ClangTidyDiagnosticConsumer
+	class CLMirrorDiagnosticConsumer : public clang::tidy::ClangTidyDiagnosticConsumer
 	{
 		std::vector<ErrorTuple> m_errors;
 
@@ -14,7 +14,7 @@ namespace clmirror {
 
 	public:
 
-		ClangReflectDiagnosticConsumer(clang::tidy::ClangTidyContext& pContext);
+		CLMirrorDiagnosticConsumer(clang::tidy::ClangTidyContext& pContext);
 
 		void HandleDiagnostic(clang::DiagnosticsEngine::Level pDiagLevel,const clang::Diagnostic& pInfo) override;
 

@@ -2,23 +2,24 @@
 #include <iostream>
 #include <unordered_set>
 
-#include "ClangReflectActionFactory.h"
+#include "Logger.h"
+#include "ASTParser.h"
 #include "ASTVisitor.h"
+#include "CLMirrorActionFactory.h"
+
 #include "clang/AST/ASTConsumer.h"
 #include "clang/Frontend/CompilerInstance.h"
-#include "ASTParser.h"
-#include "Logger.h"
 #include "clang/StaticAnalyzer/Frontend/AnalysisConsumer.h"
 
 namespace {
 
-	class FindRecordDeclsConsumer : public clang::ASTConsumer
+	class CLMirrorASTConsumer : public clang::ASTConsumer
 	{
 		const std::string& m_currentSrcFile;
 
 	public:
 
-		FindRecordDeclsConsumer(const std::string& pSrcFile)
+		CLMirrorASTConsumer(const std::string& pSrcFile)
 			: m_currentSrcFile(pSrcFile)
 		{ }
 
@@ -30,13 +31,13 @@ namespace {
 	};
 
 
-	class FindRecordDeclsAction : public clang::ASTFrontendAction
+	class CLMirrorFrontEndAction : public clang::ASTFrontendAction
 	{
 		std::string m_targetSrcFile;
 
 	public:
 
-		FindRecordDeclsAction() = default;
+		CLMirrorFrontEndAction() = default;
 
 		std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& Compiler, llvm::StringRef InFile) override
 		{
@@ -47,7 +48,7 @@ namespace {
 //#endif		//--ends--!
 
 			Compiler.getDiagnosticOpts().ShowCarets = false;
-			return std::make_unique<FindRecordDeclsConsumer>(m_targetSrcFile);
+			return std::make_unique<CLMirrorASTConsumer>(m_targetSrcFile);
 		}
 
 		bool BeginSourceFileAction(clang::CompilerInstance& CI) override {
@@ -63,6 +64,6 @@ namespace clmirror {
 
 	std::unique_ptr<clang::FrontendAction> CLMirrorActionFactory::create()
 	{
-		return std::make_unique<FindRecordDeclsAction>();
+		return std::make_unique<CLMirrorFrontEndAction>();
 	}
 }

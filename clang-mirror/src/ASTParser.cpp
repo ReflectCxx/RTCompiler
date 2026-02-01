@@ -9,8 +9,9 @@
 #include "Logger.h"
 #include "Constants.h"
 #include "ASTCodeManager.h"
-#include "ClangReflectDiagnosticConsumer.h"
-#include "ClangReflectActionFactory.h"
+#include "ClMirrorActionFactory.h"
+#include "ClMirrorDiagnosticConsumer.h"
+
 
 using namespace llvm;
 using namespace clang;
@@ -52,7 +53,7 @@ namespace clmirror
 			ClangTidyContext context(std::move(OwningOptionsProvider), false, false);
 			context.setEnableProfiling(false);
 
-			ClangReflectDiagnosticConsumer diagConsumer(context);
+			CLMirrorDiagnosticConsumer diagConsumer(context);
 			auto diagOpts = std::make_unique<DiagnosticOptions>();
 			DiagnosticsEngine diagEngine(new DiagnosticIDs(), *diagOpts, &diagConsumer, false);
 			

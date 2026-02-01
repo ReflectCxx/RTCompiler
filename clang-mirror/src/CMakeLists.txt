@@ -2,8 +2,8 @@
 set(CLREFLECT_SRCS
     "${CMAKE_CURRENT_LIST_DIR}/ASTParser.cpp"
     "${CMAKE_CURRENT_LIST_DIR}/ClangDriver.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/ClangReflectActionFactory.cpp"
-	"${CMAKE_CURRENT_LIST_DIR}/ClangReflectDiagnosticConsumer.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/CLMirrorActionFactory.cpp"
+	"${CMAKE_CURRENT_LIST_DIR}/CLMirrorDiagnosticConsumer.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/main.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/ASTDeclsUtils.cpp"
 	"${CMAKE_CURRENT_LIST_DIR}/ASTVisitor.cpp"
